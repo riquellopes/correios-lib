@@ -2,7 +2,7 @@
 class CorreiosWebService
 {
 	/**
-     * Url base para acesso ao webservise dos Correios:
+     * Url base para acesso ao webservice dos Correios:
      */	
 	const URLBASE = "http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx";
 	
@@ -31,9 +31,15 @@ class CorreiosWebService
    * @var array
    */
   private $encomendas = array();
-  
+ 
   /**
-   * Método que adiciona novas encomendas ao webservise.
+   * @access private
+   * @var int
+   */ 
+  private $qtd_encomendas = 0;
+
+  /**
+   * Método que adiciona novas encomendas ao webservice.
    *
    * @access public
    * @param Encomenda $encomenda
@@ -42,18 +48,19 @@ class CorreiosWebService
   public function add( Encomenda $encomenda )
   { 
 	 $this->encomendas[ $this->getIndex() ] = $this->processUrl( $encomenda );
+	 $this->qtd_encomendas++;
 	 return $this;
   }//function
   
   /**
-   * Método que recupera quantidade de encomendas existem no webservise.
+   * Método que recupera quantidade de encomendas existem no webservice.
    *
    * @access public
    * @return int
    */
   public function count()
-  {
-	return count( $this->encomendas );  
+  {		
+	return $this->qtd_encomendas; 
   }//function
   
   /**
@@ -65,12 +72,16 @@ class CorreiosWebService
    */
   public function __get( $name )
   {
-	 if( array_key_exists( $name, $this->encomendas ) )
-	 {	
+	try
+	{
+		$this->validation( $name, "Erro em ". __FUNCTION__.", linha ".__LINE__.": A encomenda ". $name . "não deu entrada em nosso sistema.");		
 		return $this->encomendas[ $name ];
-     }//if
+	}
+	catch(Exception $error )
+	{
+		throw new $error;
+	}//catch
 	
-	 throw new Exception( "A encomenda ". $name . "não deu entrada em nosso sistema." );
   }//function
   
   /**
@@ -86,7 +97,7 @@ class CorreiosWebService
   }//function
   
   /**
-   * Método que recupera url de acesso ao webservise dos Correios.
+   * Método que recupera url de acesso ao webservice dos Correios.
    *
    * @access private
    * @param Encomenda $encomenda
@@ -102,12 +113,50 @@ class CorreiosWebService
    * Método que apaga todas as encomendas da fila.
    *
    * @access public
-   * @param void void
+   * @param string $encomenda
    * @return bool true||false
    */
-  public function apagarEncomendas()
+  public function delete( $encomenda = "" )
   {
-  	$this->encomendas = array();
+	$encomenda = trim( $encomenda );
+	$qtd_encomendas = 0;	
+	
+	if( !$encomenda )
+		$this->encomendas = array();
+	else
+	{
+		try
+		{
+			$this->validation( $encomenda, "Erro em ". __FUNCTION__ .", linha " .__LINE__ .": Encomenda não deu entrada no webservice." );			
+			$this->encomendas[ $encomenda ] = null;
+			$qtd_encomendas = $this->qtd_encomendas;
+			$qtd_encomendas--;
+		}
+		catch( Exception $error )
+		{
+			throw $error;
+			return false;
+		}
+	}//if
+	
+	$this->qtd_encomendas = (int) $qtd_encomendas;
 	return true;
   }//function
+  
+  /**
+   * Método que verifica se uma encomenda existe.
+   *
+   * @access private
+   * @param string $name
+   * @param string $msg_error
+   * @throws Exception 
+   * @return void
+   */
+  private function validation( $name, $msg_error )
+  {
+	if( !array_key_exists( $name, $this->encomendas ) )
+		 throw new Exception( $msg_error );
+
+  }//function 
+  
 }//class

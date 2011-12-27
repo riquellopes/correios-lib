@@ -103,7 +103,7 @@ class TestCorreiosWebService extends PHPUnit_Framework_TestCase
 		unset( $encomenda1, $encomenda2 );
 	}//function
 	
-	public function test_limpar_toda_lista()
+	public function test_limpar_lista_de_encomendas()
 	{
 		$this->assertEquals( $this->correios->count(), 0);
 		$encomenda1 = new Encomenda();
@@ -129,7 +129,10 @@ class TestCorreiosWebService extends PHPUnit_Framework_TestCase
 		);
 		
 		$this->assertEquals( $this->correios->count(), 2, "Quantidade de encomendas.");
-		$this->assertTrue( $this->correios->apagarEncomendas());
+		$this->assertTrue( $this->correios->delete( "encomenda1" ) );
+		$this->assertEquals( $this->correios->count(), 1, "Quantidade de encomendas.");
+		
+		$this->assertTrue( $this->correios->delete());
 		$this->assertEquals( $this->correios->count(), 0);
 
 		unset($encomenda1, $encomenda2);

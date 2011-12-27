@@ -75,10 +75,11 @@ class Encomenda
 		);
 	
 	/**
-     * Método que verifica se $name do atributo passo existe.
+     * Método que verifica se $name do atributo existe.
 	 *
 	 * @access private
 	 * @param string $msg_error
+     * @throws Exception
 	 * @return void
      */	
 	private function validation( $name, $msg_error )
@@ -99,7 +100,7 @@ class Encomenda
 	{
 		try
 		{
-			$this->validation( $name, "Erro em ".__FUNCTION__.", linha ".__LINE__.": O atributo '". $name ."', não é padrão da encomenda." );			
+			$this->validation( $name, "Erro em ". __FUNCTION__ .", linha ". __LINE__ .": O atributo '". $name ."', não é padrão da encomenda." );
 			$this->object[ $name ]['value'] = $value;
 			return $this;			
 		}
@@ -122,7 +123,7 @@ class Encomenda
 	{
 		try
 		{		
-			$this->validation( $name, "Erro em ".__FUNCTION__.", linha ". __LINE__ .": O atributo '". $name ."', não é padrão da encomenda." );
+			$this->validation( $name, "Erro em ". __FUNCTION__ .", linha ". __LINE__ .": O atributo '". $name ."', não é padrão da encomenda." );
 			return $this->object[ $name ]['value'];
 		}
 		catch(Exception $error )
@@ -145,7 +146,7 @@ class Encomenda
 		foreach( $this->object as  $key => $parameter )
 		{
 			if( $parameter['required'] && is_null( $parameter['value'] ) )
-				throw new Exception( "Erro em ".__FUNCTION__.", linha " .__LINE__. ": O parâmetro ".$key.", deve ser informado." );
+				throw new Exception( "Erro em ". __FUNCTION__ .", linha ". __LINE__ .": O parâmetro ".$key.", deve ser informado." );
 			elseif( $parameter['required'] )
 			{
 				$data[ $parameter['name'] ] = $parameter['value'];
