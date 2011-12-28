@@ -1,9 +1,15 @@
 <?
-class Encomenda
+require_once "model.php";
+
+class Encomenda extends Model
 {
-	private $object = array(
+   /** 
+    * @access private
+    * @var array
+    */	
+	protected $object = array(
 							/***
-                             * Obrigatórios:
+                             * O preenchimento desses atributos são brigatórios:
 							 */  							
 								"formato"=>array("value"=>null, 
 												 "name"=>"nCdFormato",
@@ -30,12 +36,12 @@ class Encomenda
 												  "required"=>true
 								),
 								"codigo"=>array("value"=>null,
-												"name"=>"Codigo",
+												"name"=>"CdServico",
 												"required"=>true
 								),
 							    
                           /***
-						   * Livres / Preenchidos pelo sistema:								
+						   * O preenchimento desses atributos são livres:						
                            */
 								"valor"=>array("value"=>0,
 											   "name"=>"Valor",
@@ -73,65 +79,6 @@ class Encomenda
 											  "name"=>"Erro",
 											  "required"=>false)
 		);
-	
-	/**
-     * Método que verifica se $name do atributo existe.
-	 *
-	 * @access private
-	 * @param string $msg_error
-     * @throws Exception
-	 * @return void
-     */	
-	private function validation( $name, $msg_error )
-	{
-		if( !array_key_exists($name, $this->object ) )
-			throw new Exception( $msg_error );	
-	}//function
-		
-	/**
-     * Método que define valor do atributo $object.
-	 * 
-     * @access public
-	 * @param string $name
-     * @param mix $value
-     * @return object
-	 */
-	public function __set($name, $value)
-	{
-		try
-		{
-			$this->validation( $name, "Erro em ". __FUNCTION__ .", linha ". __LINE__ .": O atributo '". $name ."', não é padrão da encomenda." );
-			$this->object[ $name ]['value'] = $value;
-			return $this;			
-		}
-		catch( Exception $error )
-		{
-			throw $error;
-		}//try
-
-		
-	}//function
-	
-	/**
-     * Método que recupera valor do atributo $object
-	 * 
-	 * @access public
-	 * @param string $name
-	 * @return mix
-     */
-	public function __get( $name )
-	{
-		try
-		{		
-			$this->validation( $name, "Erro em ". __FUNCTION__ .", linha ". __LINE__ .": O atributo '". $name ."', não é padrão da encomenda." );
-			return $this->object[ $name ]['value'];
-		}
-		catch(Exception $error )
-		{
-			throw $error;		
-		}//try
-
-	}//function
 	
 	/**
      * Método que recupera valor do atributo $param.

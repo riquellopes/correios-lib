@@ -1,5 +1,18 @@
 <?
-class CorreiosWebService
+require_once "model.php";
+/*
+http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?nCdEmpresa=&sDsSenha=&sCepOrigem=719393
+60&sCepDestino=72151613&nVlPeso=1&nCdFormato=1&nVlComprimento=20&nVlAltura=5&nVlLargura=15
+&sCdMaoPropria=s&nVlValorDeclarado=200&sCdAvisoRecebimento=n&nCdServico=41106&nVlDiametro=0
+&StrRetorno=xml
+
+http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?nCdEmpresa=&sDsSenha=&sCepOrigem=71939360
+&sCepDestino=72151613&StrRetorno=xml&nCdFormato=1&nVlPeso=30&VlComprimento=30&nVlAltura=10
+&nVlLargura=40&nVlDiametro=60&CdServico=40045
+
+
+*/
+class CorreiosWebService extends Model
 {
 	/**
      * Url base para acesso ao webservice dos Correios:
@@ -37,6 +50,64 @@ class CorreiosWebService
    * @var int
    */ 
   private $qtd_encomendas = 0;
+  
+  /** 
+   * @access protected
+   * @var array
+   */
+  protected $object = array(
+		/***
+         * O preenchimento desses atributos são brigatórios:
+         */
+		"retorno"=>array("value"=>"xml",
+						 "name"=>"StrRetorno",
+						 "required"=>true
+		),
+		
+		"destino"=>array("value"=>null,
+						 "name"=>"sCepDestino",
+						 "required"=>true
+		),
+
+		"origem"=>array("value"=>null,
+						"name"=>"sCepOrigem",
+						"required"=>true
+		 ),
+		
+		/***
+         * O preenchimento desses atributos são livres:
+         */
+		"senha"=>array("value"=>"",
+					   "name"=>"sDsSenha",
+					   "required"=>false
+		),
+		"cod_empresa"=>array("value"=>"",
+							 "name"=>"nCdEmpresa",
+							 "required"=>false
+		)
+  );
+  
+  /**
+   * Método construtor da classe.
+   *
+   * @access public
+   * @param void void
+   * @return void
+   */
+  public function CorreiosWebService( $param = null )
+  {
+		$param = (array) $param;
+			
+		foreach( $this->object as $key => $params )
+		{
+			if( !isset($param[ $key ]) && $params['required'] )
+				throw new Exception("Erro ". __FUNCTION__ ."linha:". __LINE__ .", o atributo ". $key ." deve ser informado.");
+			
+			if( array_key_exists( $key, $param ) && isset($param[ $key ]))
+				$this->object[ $key ]["value"] = $param[ $key ];
+		}//foreach
+
+  }//function
 
   /**
    * Método que adiciona novas encomendas ao webservice.
@@ -62,28 +133,43 @@ class CorreiosWebService
   {		
 	return $this->qtd_encomendas; 
   }//function
-  
+ 
+  /**
+   * Método que verifica se uma encomenda existe.
+   *
+   * @access private
+   * @param string $name
+   * @param string $msg_error
+   * @throws Exception 
+   * @return void
+   */ 
+  protected function validation($name, $msg_error)
+  {
+  	if( !array_key_exists($name, $this->encomendas ) )
+			throw new Exception( $msg_error );
+  }//function
+
   /**
    * Método que recupera valor do atributo $encomendas
    *
    * @access public
    * @param string $name
    * @return Encomenda
-   */
-  public function __get( $name )
+   */ 
+  public function filter( $name )
   {
 	try
-	{
-		$this->validation( $name, "Erro em ". __FUNCTION__.", linha ".__LINE__.": A encomenda ". $name . "não deu entrada em nosso sistema.");		
+	{		
+		$this->validation( $name, "Erro em ". __FUNCTION__.", linha ".__LINE__.": A encomenda ". $name . "não deu entrada em nosso sistema.");
 		return $this->encomendas[ $name ];
 	}
-	catch(Exception $error )
-	{
+	catch(Exception $error)
+    {
 		throw new $error;
-	}//catch
-	
+	}//try
+
   }//function
-  
+
   /**
    * Método que recupera uma posição na fila de encomendas.
    *
@@ -97,6 +183,29 @@ class CorreiosWebService
   }//function
   
   /**
+   * Método que recupera valor do atributo $param.
+   *
+   * @access public
+   * @param void void
+   * @return string
+   */
+  public function getParam()
+  {
+		$data = array();		
+		foreach( $this->object as  $key => $parameter )
+		{
+			if( $parameter['required'] && is_null( $parameter['value'] ) )
+				throw new Exception( "Erro em ". __FUNCTION__ .", linha ". __LINE__ .": O parâmetro ".$key.", deve ser informado." );
+			
+			$data[ $parameter['name'] ] = $parameter['value'];
+
+		}//foreach
+		
+		$data = array_reverse( $data );
+		return (string) "?".http_build_query( $data );
+  }//function
+
+  /**
    * Método que recupera url de acesso ao webservice dos Correios.
    *
    * @access private
@@ -105,7 +214,7 @@ class CorreiosWebService
    */
   private function processUrl( Encomenda &$encomenda )
   {
-	  $encomenda->url = ( CorreiosWebService::URLBASE."?".$encomenda->getParam() );
+	  $encomenda->url = trim( CorreiosWebService::URLBASE.$this->getParam()."&".$encomenda->getParam() );
 	  return $encomenda;
   }//function
   
@@ -143,20 +252,53 @@ class CorreiosWebService
 	return true;
   }//function
   
+    
   /**
-   * Método que verifica se uma encomenda existe.
-   *
-   * @access private
-   * @param string $name
-   * @param string $msg_error
-   * @throws Exception 
-   * @return void
+   * Método que processa encomenda.
+   * 
+   * @access public
+   * @param void void
+   * @return bool true||false
    */
-  private function validation( $name, $msg_error )
+  public function processEncomendas()
   {
-	if( !array_key_exists( $name, $this->encomendas ) )
-		 throw new Exception( $msg_error );
+		foreach( $this->encomendas as $encomenda )
+		{
+			$xml = $this->accessServer( $encomenda->url );
+			
+			echo $xml;
+			break;	
+		}//function
+	 
+		#return true;
+  }//function
+ 
+  private function accessServer( $url = "" )
+  {
+	 /*$handle = curl_init( $url );
+			   curl_setopt($handle, CURLOPT_RETURNTRANSFER, 1);*/
+			   
+				echo $url;
+				echo "\n";
+				exit;
+			  // try
+			   //{
+					include_once "local_settings.php";
 
-  }//function 
-  
+					//if( !include_once "local_settings.php" )
+						//throw new Exception( "" );
+					
+					/*curl_setopt($handle, CURLOPT_PROXY, "http://".PROXY);
+			  		curl_setopt($handle, CURLOPT_PROXYPORT, PORT);
+			   		curl_setopt($handle, CURLOPT_PROXYUSERPWD, USER.":".PASSWORD);
+				//}
+				//catch( Exception $error ){}
+
+	$xml = curl_exec( $handle ); 
+  		   curl_close( $handle ); 
+	
+	return $xml;*/
+	
+  }//function
+
 }//class

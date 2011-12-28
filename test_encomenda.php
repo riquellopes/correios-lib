@@ -60,7 +60,7 @@ class TestEncomenda extends PHPUnit_Framework_TestCase
 		$param = $this->encomenda->getParam();
 		
 		$this->assertTrue( is_string( $param ) );
-		$this->assertEquals( $param,  "nCdFormato=1&nVlPeso=100&VlComprimento=60&nVlAltura=80&nVlLargura=80&nVlDiametro=100&Codigo=40045" );
+		$this->assertEquals( $param,  "nCdFormato=1&nVlPeso=100&VlComprimento=60&nVlAltura=80&nVlLargura=80&nVlDiametro=100&CdServico=40045" );
 	}//function
 	
 	public function test_os_parametros_passados_para_encomenda_2_deve_gerar_uma_url()
@@ -76,7 +76,7 @@ class TestEncomenda extends PHPUnit_Framework_TestCase
 		
 		$param = $encomenda->getParam();
 		$this->assertTrue( is_string( $param ) );
-		$this->assertEquals( $param,  "nCdFormato=2&nVlPeso=30&VlComprimento=30&nVlAltura=10&nVlLargura=40&nVlDiametro=60&Codigo=40045" );
+		$this->assertEquals( $param,  "nCdFormato=2&nVlPeso=30&VlComprimento=30&nVlAltura=10&nVlLargura=40&nVlDiametro=60&CdServico=40045" );
 
 		unset( $encomenda );
 	}//function

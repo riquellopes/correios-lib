@@ -9,14 +9,34 @@ class TestCorreiosWebService extends PHPUnit_Framework_TestCase
 
 	public function setUp()
 	{
-		$this->correios = new CorreiosWebService();
+		$this->correios = new CorreiosWebService(array("origem"=>71939360, "destino"=>72151613, "retorno"=>"xml"));
 	}//function
 	
 	public function test_cria_web_service()
 	{
 		$this->assertTrue( $this->correios instanceof CorreiosWebService );	
 	}//function
+	
+	public function test_caso_informacoes_basicas_nao_seja_passadas_deve_haver_um_exception()
+	{
+		$this->setExpectedException( "Exception" );			
+		$correios = new CorreiosWebService();
 
+	}//function
+	
+	public function test_parametros_passados_para_webservice_deve_gerar_uma_query_string()
+	{
+		$this->assertEquals( $this->correios->getParam(), "?nCdEmpresa=&sDsSenha=&sCepOrigem=71939360&sCepDestino=72151613&StrRetorno=xml");
+	}//function
+	
+	public function test_caso_atributo_obrigatorio_seja_apagado_deve_haver_exception()
+	{
+		$this->setExpectedException( "Exception" );
+		$this->correios->origem = null;
+		
+		$this->correios->getParam();
+	}//function
+	
 	public function test_verifica_url_base_existe()
 	{
 		$this->assertEquals( CorreiosWebService::URLBASE, "http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx" );
@@ -90,16 +110,16 @@ class TestCorreiosWebService extends PHPUnit_Framework_TestCase
 		);
 		
 		$this->assertEquals( $this->correios->count(), 2, "Quantidade de encomendas.");
-	    $encomenda1 = $this->correios->encomenda1;
+	    $encomenda1 = $this->correios->filter('encomenda1');
 		
 		$this->assertEquals($encomenda1->formato, 2, "Formato da primeira encomenda.");
 		$this->assertEquals($encomenda1->codigo, 40045);
-		$this->assertEquals($encomenda1->url, "http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?nCdFormato=2&nVlPeso=30&VlComprimento=30&nVlAltura=10&nVlLargura=40&nVlDiametro=60&Codigo=40045");
+		$this->assertEquals($encomenda1->url, "http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?nCdEmpresa=&sDsSenha=&sCepOrigem=71939360&sCepDestino=72151613&StrRetorno=xml&nCdFormato=2&nVlPeso=30&VlComprimento=30&nVlAltura=10&nVlLargura=40&nVlDiametro=60&CdServico=40045");
 
-		$encomenda2 = $this->correios->encomenda2;
+		$encomenda2 = $this->correios->filter('encomenda2');
 		$this->assertEquals($encomenda2->formato, 1, "Formato do segunda encomenda.");
 		$this->assertEquals($encomenda2->codigo, 81850, "Codigo atendimento encomenda2.");
-		$this->assertEquals($encomenda2->url, "http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?nCdFormato=1&nVlPeso=100&VlComprimento=50&nVlAltura=70&nVlLargura=40&nVlDiametro=60&Codigo=81850");
+		$this->assertEquals($encomenda2->url, "http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?nCdEmpresa=&sDsSenha=&sCepOrigem=71939360&sCepDestino=72151613&StrRetorno=xml&nCdFormato=1&nVlPeso=100&VlComprimento=50&nVlAltura=70&nVlLargura=40&nVlDiametro=60&CdServico=81850");
 		unset( $encomenda1, $encomenda2 );
 	}//function
 	
@@ -138,4 +158,22 @@ class TestCorreiosWebService extends PHPUnit_Framework_TestCase
 		unset($encomenda1, $encomenda2);
 	}//function
 		
+	/*public function test_process_encomendas_deve_retornar_true_apos_processamento()
+	{
+		$this->assertEquals( $this->correios->count(), 0);
+		$encomenda1 = new Encomenda();
+		$this->correios
+		->add(
+			$encomenda1->__set("formato", 1)
+					   ->__set("peso", 30)
+					   ->__set("comprimento", 30)
+					   ->__set("altura", 10)
+					   ->__set("largura", 40)
+					   ->__set("diametro", 60)
+					   ->__set("codigo", CorreiosWebService::SEDEX_A_COBRAR_SEM_CONTRATO )
+		);
+		$this->assertEquals( $this->correios->count(), 1, "Quantidade de encomendas.");
+		$this->assertTrue( $this->correios->processEncomendas() );
+		$this->assertTrue( $this->correios->filter("encomenda1")->valor != 0 );
+	}//function*/
 }//class
