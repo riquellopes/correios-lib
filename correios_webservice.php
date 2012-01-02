@@ -1,5 +1,12 @@
 <?
 require_once "model.php";
+ try
+{
+	if( @!include_once "local_settings.php" ) throw new Exception( " " );
+}
+catch( Exception $error ){
+	require_once "settings.php";
+}
 
 class CorreiosWebService extends Model
 {
@@ -313,18 +320,13 @@ class CorreiosWebService extends Model
   {
 	 $handle = curl_init( $url );
 			   curl_setopt($handle, CURLOPT_RETURNTRANSFER, 1);
-			   
-			  try
-			  {
-
-					if( @!include_once "local_settings.php" )
-						throw new Exception( "Erro, não existe arquivo local_settings." );
-					
-					curl_setopt($handle, CURLOPT_PROXY, "http://".PROXY);
+			  
+			   if( USAGE_PROXY )
+			   {
+					curl_setopt($handle, CURLOPT_PROXY, PROXY);
 			  		curl_setopt($handle, CURLOPT_PROXYPORT, PORT);
 			   		curl_setopt($handle, CURLOPT_PROXYUSERPWD, USER.":".PASSWORD);
-			  }
-			  catch( Exception $error ){}
+			   }//if
 
 	$xml = curl_exec( $handle ); 
   		   curl_close( $handle );
