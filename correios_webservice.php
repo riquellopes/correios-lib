@@ -1,18 +1,6 @@
 <?
 require_once "model.php";
-/*
-http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?nCdEmpresa=&sDsSenha=&sCepOrigem=71939360
-&sCepDestino=72151613&nVlPeso=1&nCdFormato=1&nVlComprimento=20&nVlAltura=5&nVlLargura=15
-&sCdMaoPropria=s&nVlValorDeclarado=200&sCdAvisoRecebimento=n&nCdServico=41106&nVlDiametro=0
-&StrRetorno=xml
 
-http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?nCdEmpresa=&sDsSenha=&sCepOrigem=71939360
-&sCepDestino=72151613&nVlPeso=1&nCdFormato=1&nVlComprimento=20&nVlAltura=5&nVlLargura=15
-&sCdMaoPropria=s&nVlValorDeclarado=200&sCdAvisoRecebimento=n&nCdServico=41106&nVlDiametro=0
-&StrRetorno=xml
-
-http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?nCdEmpresa=&sDsSenha=&sCepOrigem=71939360&sCepDestino=72151613&StrRetorno=xml&nCdFormato=1&nVlPeso=1&nVlComprimento=20&nVlAltura=5&nVlLargura=15&nVlDiametro=0&nCdServico=41106&sCdMaoPropria=s&sCdAvisoRecebimento=n&nVlValorDeclarado=200
-*/
 class CorreiosWebService extends Model
 {
 	/**
@@ -253,7 +241,25 @@ class CorreiosWebService extends Model
 	return true;
   }//function
   
-    
+  /**
+   * Método que formata valor para padrão Usa.
+   *
+   * @access public
+   * @param string $valor
+   * @return float
+   */
+  public function usMoney( $valor )
+  {
+		if( preg_match('/[a-zA-Z]/', $valor) )
+			throw new Exception( "Erro em".__FUNCTION__.", linha ".__LINE__.": valor passado não é o valor valido." );
+		
+		$valor = preg_replace("/\./", "", $valor);
+		$valor = preg_replace("/,/", "." ,$valor);	  		
+		
+		return (float) $valor;
+		
+  }//function
+  
   /**
    * Método que processa encomenda.
    * 
@@ -263,16 +269,36 @@ class CorreiosWebService extends Model
    */
   public function processEncomendas()
   {
-		foreach( $this->encomendas as $encomenda )
+		foreach( $this->encomendas as $key => $object )
 		{
-			$xml = $this->accessServer( $encomenda->url );
-			
-			echo $xml;
-			
-			break;	
-		}//function
+				$xml = simplexml_load_string( 
+							$this->accessServer( $object->url ) 
+				);
+				
+				if( $xml === false )
+					return false;
+				else
+				{				
+					foreach( $xml as $en )
+					{
+						$object->valor = $this->usMoney( $en->Valor );
+						$object->valor_mao_propria = $this->usMoney( $en->ValorMaoPropria );
+						$object->valor_aviso_recebimento = $this->usMoney( $en->ValorAvisoRecebimento );
+						$object->valor_declarado = (float) ( $this->usMoney( $object->valor_declarado ) +
+															 $this->usMoney( $en->ValorValorDeclarado ) );						
+
+						$object->entrega_domiciliar = strtoupper( $en->EntregaDomiciliar ) == 'S' ? true : false;
+						$object->entrega_sabado = strtoupper( $en->EntregaSabado ) == 'S' ? true : false;
+						$object->prazo_entrega = (int) $en->PrazoEntrega;
+						$object->erro = $en->Erro;
+						$object->msg_erro = utf8_encode( $en->MsgErro );
+						
+						unset( $en );
+					}//foreach
+			    }//if
+		}//foreach
 	 
-		#return true;
+		return true;
   }//function
  
   /**
@@ -302,8 +328,9 @@ class CorreiosWebService extends Model
 
 	$xml = curl_exec( $handle ); 
   		   curl_close( $handle );
-	return $xml;
 	
+	unset( $handle );
+	return $xml;
   }//function
 
 }//class

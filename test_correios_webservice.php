@@ -160,7 +160,23 @@ class TestCorreiosWebService extends PHPUnit_Framework_TestCase
 
 		unset($encomenda1, $encomenda2);
 	}//function
-		
+	
+	public function test_converte_1050_para_us_moeda()
+	{
+		$this->assertEquals( $this->correios->usMoney('10,50'), 10.50);	
+	}//function
+	
+	public function test_converte_1570_para_us_moeda()
+	{
+		$this->assertEquals( $this->correios->usMoney('15,70'), 15.70);	
+	}//function
+	
+	public function test_caso_valor_convertido_nao_seja_valor_deve_haver_exception()
+	{
+		$this->setExpectedException( "Exception" );
+		$this->correios->usMoney('15,aa');
+	}//function
+
 	public function test_process_encomendas_deve_retornar_true_apos_processamento()
 	{
 		$this->assertEquals( $this->correios->count(), 0);
@@ -180,7 +196,7 @@ class TestCorreiosWebService extends PHPUnit_Framework_TestCase
 		);
 		$this->assertEquals( $this->correios->count(), 1, "Quantidade de encomendas.");
 		$this->assertTrue( $this->correios->processEncomendas() );
-		#$this->assertTrue( $this->correios->filter("encomenda1")->valor != 0 );
+		$this->assertEquals( $this->correios->filter("encomenda1")->valor,  15.7 );
 		
 	}//function
 	

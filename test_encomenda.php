@@ -95,7 +95,7 @@ class TestEncomenda extends PHPUnit_Framework_TestCase
 				  ->__set("codigo", 40045);
 		
 		$json = $encomenda->toJson();
-		$this->assertEquals( $json, '{"formato":2,"peso":30,"comprimento":30,"altura":10,"largura":40,"diametro":60,"codigo":40045,"valor":0,"prazo_entrega":0,"mao_propria":false,"aviso_recebimento":false,"valor_declarado":0,"entrega_domiciliar":false,"entrega_sabado":false,"url":"","erro":0}');
+		$this->assertEquals( $json, '{"formato":2,"peso":30,"comprimento":30,"altura":10,"largura":40,"diametro":60,"codigo":40045,"valor":0,"valor_mao_propria":0,"valor_aviso_recebimento":0,"prazo_entrega":0,"mao_propria":false,"aviso_recebimento":false,"valor_declarado":0,"entrega_domiciliar":false,"entrega_sabado":false,"url":"","erro":0,"msg_erro":""}');
 	}//function
 	
 	public function test_to_json_encomenda2()
@@ -112,7 +112,7 @@ class TestEncomenda extends PHPUnit_Framework_TestCase
 				  ->__set("mao_propria", true);
 		
 		$json = $encomenda->toJson();
-		$this->assertEquals( $json, '{"formato":1,"peso":100,"comprimento":50,"altura":100,"largura":50,"diametro":100,"codigo":40045,"valor":0,"prazo_entrega":0,"mao_propria":true,"aviso_recebimento":true,"valor_declarado":0,"entrega_domiciliar":false,"entrega_sabado":false,"url":"","erro":0}');
+		$this->assertEquals( $json, '{"formato":1,"peso":100,"comprimento":50,"altura":100,"largura":50,"diametro":100,"codigo":40045,"valor":0,"valor_mao_propria":0,"valor_aviso_recebimento":0,"prazo_entrega":0,"mao_propria":true,"aviso_recebimento":true,"valor_declarado":0,"entrega_domiciliar":false,"entrega_sabado":false,"url":"","erro":0,"msg_erro":""}');
 	}//function
 	
 }//class

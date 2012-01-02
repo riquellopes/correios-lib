@@ -55,6 +55,16 @@ class Encomenda extends Model
 											   "required"=>false,
 											   "url"=>false
 								),
+								"valor_mao_propria"=>array("value"=>0,
+											   			   "name"=>"ValorMaoPropria",
+														   "required"=>false,
+														   "url"=>false
+								),
+								"valor_aviso_recebimento"=>array("value"=>0,
+																 "name"=>"ValorAvisoRecebimento",
+																 "required"=>false,
+																 "url"=>false
+								),
 								"prazo_entrega"=>array("value"=>0,
 													   "name"=>"PrazoEntrega",
 													   "required"=>false,
@@ -95,6 +105,11 @@ class Encomenda extends Model
 											  "name"=>"Erro",
 											  "required"=>false,
 											  "url"=>false
+								),
+							    "msg_erro"=>array("value"=>"",
+												  "name"=>"MsgErro",
+												  "required"=>false,
+												  "url"=>false
 								)
 		);
 	
