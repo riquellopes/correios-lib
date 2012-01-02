@@ -13,31 +13,38 @@ class Encomenda extends Model
 							 */  							
 								"formato"=>array("value"=>null, 
 												 "name"=>"nCdFormato",
-												 "required"=>true
+												 "required"=>true,
+												 "url"=>true
 								),
 								"peso"=>array("value"=>null, 
 											  "name"=>"nVlPeso",
-											  "required"=>true
+											  "required"=>true,
+											  "url"=>true
 								),
 								"comprimento"=>array("value"=>null, 
-													 "name"=>"VlComprimento",
-													 "required"=>true
+													 "name"=>"nVlComprimento",
+													 "required"=>true,
+												 	 "url"=>true
 								),
 								"altura"=>array("value"=>null, 
 												"name"=>"nVlAltura",
 												"required"=>true,
+												"url"=>true
 								),
 								"largura"=>array("value"=>null, 
 												 "name"=>"nVlLargura",
-												 "required"=>true
+												 "required"=>true,
+												 "url"=>true
 								),
 								"diametro"=>array("value"=>null, 
 												  "name"=>"nVlDiametro",
-												  "required"=>true
+												  "required"=>true,
+												  "url"=>true
 								),
 								"codigo"=>array("value"=>null,
-												"name"=>"CdServico",
-												"required"=>true
+												"name"=>"nCdServico",
+												"required"=>true,
+												"url"=>true
 								),
 							    
                           /***
@@ -45,39 +52,50 @@ class Encomenda extends Model
                            */
 								"valor"=>array("value"=>0,
 											   "name"=>"Valor",
-											   "required"=>false
+											   "required"=>false,
+											   "url"=>false
 								),
 								"prazo_entrega"=>array("value"=>0,
 													   "name"=>"PrazoEntrega",
-													   "required"=>false
+													   "required"=>false,
+												 	   "url"=>false
 								),
-								"valor_mao_propria"=>array("value"=>0,
-														   "name"=>"ValorMaoPropria",
-														   "required"=>false
+								"mao_propria"=>array("value"=>false,
+													 "name"=>"sCdMaoPropria",
+													 "required"=>false,
+												 	 "url"=>true
 								),
-								"valor_aviso_recebimento"=>array("value"=>0,
-																 "name"=>"ValorAvisoRecebimento",
-																 "required"=>false
+								"aviso_recebimento"=>array("value"=>false,
+														   "name"=>"sCdAvisoRecebimento",
+														   "required"=>false,
+														   "url"=>true
 								),
 								"valor_declarado"=>array("value"=>0,
-														 "name"=>"ValorValorDeclarado",
-														 "required"=>false
+														 "name"=>"nVlValorDeclarado",
+														 "required"=>false,
+														 "url"=>true
 								),
 								"entrega_domiciliar"=>array("value"=>false,
 															"name"=>"EntregaDomiciliar",
 															"required"=>false,
+														    "url"=>false
+
 								),
 								"entrega_sabado"=>array("value"=>false,
 														"name"=>"EntregaSabado",
-														"required"=>false
+														"required"=>false,
+												 		"url"=>false
 								),
 								"url"=>array("value"=>"",
 											 "name"=>"url",
-											 "required"=>false
+											 "required"=>false,
+											 "url"=>false
 								),
 								"erro"=>array("value"=>0,
 											  "name"=>"Erro",
-											  "required"=>false)
+											  "required"=>false,
+											  "url"=>false
+								)
 		);
 	
 	/**
@@ -94,30 +112,28 @@ class Encomenda extends Model
 		{
 			if( $parameter['required'] && is_null( $parameter['value'] ) )
 				throw new Exception( "Erro em ". __FUNCTION__ .", linha ". __LINE__ .": O parâmetro ".$key.", deve ser informado." );
-			elseif( $parameter['required'] )
+
+			/**
+			 * Monta url.
+             */
+			elseif( $parameter['url'] )
 			{
-				$data[ $parameter['name'] ] = $parameter['value'];
+				$value = $parameter['value'];
+				
+				/**
+                 * Caso o value seja do tipo bool, ele convertido para String:
+                 * true => s
+                 * false => n
+                 */
+				if( is_bool( $value ) )
+					$value = $value ? "s" : "n";
+		
+				$data[ $parameter['name'] ] = $value;
 			}//if
 
 		}//foreach
 		
 		return (string) http_build_query( $data );
-	}//function
-	
-    /**
-     * Método que faz o parse dos atributos da class para o formato JSON.
-	 *
-     * @access public
-     * @param void void
-     * @return json
-     */
-	public function toJson()
-	{
-		$data = array();		
-		foreach( $this->object as $key => $parameter )
-			$data[ $key ] = $parameter[ "value" ];
-		
-		return json_encode( $data );
 	}//function
 	
 }//class

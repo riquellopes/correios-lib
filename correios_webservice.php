@@ -1,16 +1,17 @@
 <?
 require_once "model.php";
 /*
-http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?nCdEmpresa=&sDsSenha=&sCepOrigem=719393
-60&sCepDestino=72151613&nVlPeso=1&nCdFormato=1&nVlComprimento=20&nVlAltura=5&nVlLargura=15
+http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?nCdEmpresa=&sDsSenha=&sCepOrigem=71939360
+&sCepDestino=72151613&nVlPeso=1&nCdFormato=1&nVlComprimento=20&nVlAltura=5&nVlLargura=15
 &sCdMaoPropria=s&nVlValorDeclarado=200&sCdAvisoRecebimento=n&nCdServico=41106&nVlDiametro=0
 &StrRetorno=xml
 
 http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?nCdEmpresa=&sDsSenha=&sCepOrigem=71939360
-&sCepDestino=72151613&StrRetorno=xml&nCdFormato=1&nVlPeso=30&VlComprimento=30&nVlAltura=10
-&nVlLargura=40&nVlDiametro=60&CdServico=40045
+&sCepDestino=72151613&nVlPeso=1&nCdFormato=1&nVlComprimento=20&nVlAltura=5&nVlLargura=15
+&sCdMaoPropria=s&nVlValorDeclarado=200&sCdAvisoRecebimento=n&nCdServico=41106&nVlDiametro=0
+&StrRetorno=xml
 
-
+http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?nCdEmpresa=&sDsSenha=&sCepOrigem=71939360&sCepDestino=72151613&StrRetorno=xml&nCdFormato=1&nVlPeso=1&nVlComprimento=20&nVlAltura=5&nVlLargura=15&nVlDiametro=0&nCdServico=41106&sCdMaoPropria=s&sCdAvisoRecebimento=n&nVlValorDeclarado=200
 */
 class CorreiosWebService extends Model
 {
@@ -118,7 +119,7 @@ class CorreiosWebService extends Model
    */
   public function add( Encomenda $encomenda )
   { 
-	 $this->encomendas[ $this->getIndex() ] = $this->processUrl( $encomenda );
+	 $this->encomendas[ $this->getIndex() ] = $this->createUrl( $encomenda );
 	 $this->qtd_encomendas++;
 	 return $this;
   }//function
@@ -212,9 +213,9 @@ class CorreiosWebService extends Model
    * @param Encomenda $encomenda
    * @return Encomenda
    */
-  private function processUrl( Encomenda &$encomenda )
+  private function createUrl( Encomenda &$encomenda )
   {
-	  $encomenda->url = trim( CorreiosWebService::URLBASE.$this->getParam()."&".$encomenda->getParam() );
+	  $encomenda->url = trim( CorreiosWebService::URLBASE."".$this->getParam()."&".$encomenda->getParam() );
 	  return $encomenda;
   }//function
   
@@ -267,37 +268,41 @@ class CorreiosWebService extends Model
 			$xml = $this->accessServer( $encomenda->url );
 			
 			echo $xml;
+			
 			break;	
 		}//function
 	 
 		#return true;
   }//function
  
+  /**
+   * Método que faz consulta ao webservice dos correios,
+   * e verifica o preço da encomenda.
+   *
+   * @access private
+   * @param String $url
+   * @return xml
+   */
   private function accessServer( $url = "" )
   {
-	 /*$handle = curl_init( $url );
-			   curl_setopt($handle, CURLOPT_RETURNTRANSFER, 1);*/
+	 $handle = curl_init( $url );
+			   curl_setopt($handle, CURLOPT_RETURNTRANSFER, 1);
 			   
-				echo $url;
-				echo "\n";
-				exit;
-			  // try
-			   //{
-					include_once "local_settings.php";
+			  try
+			  {
 
-					//if( !include_once "local_settings.php" )
-						//throw new Exception( "" );
+					if( @!include_once "local_settings.php" )
+						throw new Exception( "Erro, não existe arquivo local_settings." );
 					
-					/*curl_setopt($handle, CURLOPT_PROXY, "http://".PROXY);
+					curl_setopt($handle, CURLOPT_PROXY, "http://".PROXY);
 			  		curl_setopt($handle, CURLOPT_PROXYPORT, PORT);
 			   		curl_setopt($handle, CURLOPT_PROXYUSERPWD, USER.":".PASSWORD);
-				//}
-				//catch( Exception $error ){}
+			  }
+			  catch( Exception $error ){}
 
 	$xml = curl_exec( $handle ); 
-  		   curl_close( $handle ); 
-	
-	return $xml;*/
+  		   curl_close( $handle );
+	return $xml;
 	
   }//function
 

@@ -107,6 +107,8 @@ class TestCorreiosWebService extends PHPUnit_Framework_TestCase
 					   ->__set("largura", 40)
 					   ->__set("diametro", 60)
 					   ->__set("codigo", CorreiosWebService::E_SEDEX_COM_CONTRATO_GRUPO_TRES )
+					   ->__set("valor_declarado", 200)
+				  	   ->__set("aviso_recebimento", true)
 		);
 		
 		$this->assertEquals( $this->correios->count(), 2, "Quantidade de encomendas.");
@@ -114,12 +116,13 @@ class TestCorreiosWebService extends PHPUnit_Framework_TestCase
 		
 		$this->assertEquals($encomenda1->formato, 2, "Formato da primeira encomenda.");
 		$this->assertEquals($encomenda1->codigo, 40045);
-		$this->assertEquals($encomenda1->url, "http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?nCdEmpresa=&sDsSenha=&sCepOrigem=71939360&sCepDestino=72151613&StrRetorno=xml&nCdFormato=2&nVlPeso=30&VlComprimento=30&nVlAltura=10&nVlLargura=40&nVlDiametro=60&CdServico=40045");
+		$this->assertEquals($encomenda1->url, "http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?nCdEmpresa=&sDsSenha=&sCepOrigem=71939360&sCepDestino=72151613&StrRetorno=xml&nCdFormato=2&nVlPeso=30&nVlComprimento=30&nVlAltura=10&nVlLargura=40&nVlDiametro=60&nCdServico=40045&sCdMaoPropria=n&sCdAvisoRecebimento=n&nVlValorDeclarado=0");
 
 		$encomenda2 = $this->correios->filter('encomenda2');
 		$this->assertEquals($encomenda2->formato, 1, "Formato do segunda encomenda.");
 		$this->assertEquals($encomenda2->codigo, 81850, "Codigo atendimento encomenda2.");
-		$this->assertEquals($encomenda2->url, "http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?nCdEmpresa=&sDsSenha=&sCepOrigem=71939360&sCepDestino=72151613&StrRetorno=xml&nCdFormato=1&nVlPeso=100&VlComprimento=50&nVlAltura=70&nVlLargura=40&nVlDiametro=60&CdServico=81850");
+		$this->assertEquals($encomenda2->url, "http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?nCdEmpresa=&sDsSenha=&sCepOrigem=71939360&sCepDestino=72151613&StrRetorno=xml&nCdFormato=1&nVlPeso=100&nVlComprimento=50&nVlAltura=70&nVlLargura=40&nVlDiametro=60&nCdServico=81850&sCdMaoPropria=n&sCdAvisoRecebimento=s&nVlValorDeclarado=200");
+		
 		unset( $encomenda1, $encomenda2 );
 	}//function
 	
@@ -158,22 +161,27 @@ class TestCorreiosWebService extends PHPUnit_Framework_TestCase
 		unset($encomenda1, $encomenda2);
 	}//function
 		
-	/*public function test_process_encomendas_deve_retornar_true_apos_processamento()
+	public function test_process_encomendas_deve_retornar_true_apos_processamento()
 	{
 		$this->assertEquals( $this->correios->count(), 0);
 		$encomenda1 = new Encomenda();
 		$this->correios
 		->add(
 			$encomenda1->__set("formato", 1)
-					   ->__set("peso", 30)
-					   ->__set("comprimento", 30)
-					   ->__set("altura", 10)
-					   ->__set("largura", 40)
-					   ->__set("diametro", 60)
-					   ->__set("codigo", CorreiosWebService::SEDEX_A_COBRAR_SEM_CONTRATO )
+					   ->__set("peso", 1)
+					   ->__set("comprimento", 20)
+					   ->__set("altura", 5)
+					   ->__set("largura", 15)
+					   ->__set("mao_propria", true)
+					   ->__set("valor_declarado", 200)
+					   ->__set("aviso_recebimento", false)
+					   ->__set("diametro", 0)
+					   ->__set("codigo", CorreiosWebService::PAC_SEM_CONTRATO )
 		);
 		$this->assertEquals( $this->correios->count(), 1, "Quantidade de encomendas.");
 		$this->assertTrue( $this->correios->processEncomendas() );
-		$this->assertTrue( $this->correios->filter("encomenda1")->valor != 0 );
-	}//function*/
+		#$this->assertTrue( $this->correios->filter("encomenda1")->valor != 0 );
+		
+	}//function
+	
 }//class

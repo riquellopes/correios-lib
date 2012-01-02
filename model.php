@@ -67,5 +67,21 @@ abstract class Model
 		if( !array_key_exists($name, $this->object ) )
 			throw new Exception( $msg_error );
 	}//function
+	
+	/**
+     * Método que faz o parse dos atributos da class para o formato JSON.
+     *
+	 * @access public
+     * @param void void
+     * @return json
+     */
+	public function toJson()
+	{
+		$data = array();		
+		foreach( $this->object as $key => $parameter )
+			$data[ $key ] = $parameter[ "value" ];
+		
+		return json_encode( $data );
+	}//function
 
 }//class
