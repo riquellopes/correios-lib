@@ -59,7 +59,7 @@ class TestCorreiosWebService extends PHPUnit_Framework_TestCase
 		$this->assertEquals( CorreiosWebService::E_SEDEX_COM_CONTRATO, 81019);
 		$this->assertEquals( CorreiosWebService::E_SEDEX_COM_CONTRATO_GRUPO_UM, 81868);
 		$this->assertEquals( CorreiosWebService::E_SEDEX_COM_CONTRATO_GRUPO_DOIS, 81833);
-		$this->assertEquals( CorreiosWebService:: E_SEDEX_COM_CONTRATO_GRUPO_TRES, 81850);
+		$this->assertEquals( CorreiosWebService::E_SEDEX_COM_CONTRATO_GRUPO_TRES, 81850);
 		
 	}//function
 	
