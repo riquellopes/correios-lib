@@ -57,17 +57,20 @@ class CorreiosWebService extends Model
          */
 		"retorno"=>array("value"=>"xml",
 						 "name"=>"StrRetorno",
-						 "required"=>true
+						 "required"=>false,
+						 "rule"=>"xml"
 		),
 		
 		"destino"=>array("value"=>null,
 						 "name"=>"sCepDestino",
-						 "required"=>true
+						 "required"=>true,
+						 "rule"=>"^[0-9]{8}$"
 		),
 
 		"origem"=>array("value"=>null,
 						"name"=>"sCepOrigem",
-						"required"=>true
+						"required"=>true,
+						"rule"=>"^[0-9]{8}$"
 		 ),
 		
 		/***
@@ -75,11 +78,13 @@ class CorreiosWebService extends Model
          */
 		"senha"=>array("value"=>"",
 					   "name"=>"sDsSenha",
-					   "required"=>false
+					   "required"=>false,
+					   "rule"=>null
 		),
 		"cod_empresa"=>array("value"=>"",
 							 "name"=>"nCdEmpresa",
-							 "required"=>false
+							 "required"=>false,
+							 "rule"=>null
 		)
   );
   
@@ -93,14 +98,20 @@ class CorreiosWebService extends Model
   public function CorreiosWebService( $param = null )
   {
 		$param = (array) $param;
-			
+		
 		foreach( $this->object as $key => $params )
 		{
-			if( !isset($param[ $key ]) && $params['required'] )
-				throw new Exception("Erro ". __FUNCTION__ ."linha:". __LINE__ .", o atributo ". $key ." deve ser informado.");
+			/***
+			 * Se atributo não for obrigatório, ele deve receber seu valor default::
+			 */				
+				$value = isset($param[ $key ]) ? $param[ $key ] : $this->object[ $key ][ 'value' ];
+				$rule = $this->object[ $key ]["rule"];
 			
-			if( array_key_exists( $key, $param ) && isset($param[ $key ]))
-				$this->object[ $key ]["value"] = $param[ $key ];
+				if( !is_null( $rule ) && !eregi( $rule, $value ) )
+					throw new Exception("Erro ". __FUNCTION__ ."linha:". __LINE__ .", o atributo ". $key ." não atende as regras do service.");
+				$this->object[ $key ]["value"] = $value;
+			
+				unset( $rule, $value);
 		}//foreach
 
   }//function
@@ -276,10 +287,17 @@ class CorreiosWebService extends Model
    */
   public function processEncomendas()
   {
+		$process = false;		
 		foreach( $this->encomendas as $key => $object )
-		{
+		{				
+				/***
+                 * Sistema não deve processar possições nulas do array::
+                 */				
+				if( is_null( $object ) )
+					continue;
+				
 				$xml = simplexml_load_string( 
-							$this->accessServer( $object->url ) 
+						$this->accessServer( $object->url ) 
 				);
 				
 				if( $xml === false )
@@ -302,10 +320,12 @@ class CorreiosWebService extends Model
 						
 						unset( $en );
 					}//foreach
+					
+					$process = true;
 			    }//if
 		}//foreach
 	 
-		return true;
+		return $process;
   }//function
  
   /**
@@ -318,8 +338,11 @@ class CorreiosWebService extends Model
    */
   private function accessServer( $url = "" )
   {
-	 $handle = curl_init( $url );
-			   curl_setopt($handle, CURLOPT_RETURNTRANSFER, 1);
+	if( !preg_match( "|^http(s)?://[a-z0-9-]+(\.[a-z0-9-]+)*(:[0-9]+)?(/.*)?$|i", $url ) )
+		return ""; 
+
+	$handle = curl_init( $url );
+			  curl_setopt($handle, CURLOPT_RETURNTRANSFER, 1);
 			  
 			   if( USAGE_PROXY )
 			   {

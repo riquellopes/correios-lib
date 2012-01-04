@@ -9,7 +9,7 @@ class TestCorreiosWebService extends PHPUnit_Framework_TestCase
 
 	public function setUp()
 	{
-		$this->correios = new CorreiosWebService(array("origem"=>71939360, "destino"=>72151613, "retorno"=>"xml"));
+		$this->correios = new CorreiosWebService(array("origem"=>71939360, "destino"=>72151613));
 	}//function
 	
 	public function test_cria_web_service()
@@ -17,11 +17,18 @@ class TestCorreiosWebService extends PHPUnit_Framework_TestCase
 		$this->assertTrue( $this->correios instanceof CorreiosWebService );	
 	}//function
 	
-	public function test_caso_informacoes_basicas_nao_seja_passadas_deve_haver_um_exception()
+	public function test_caso_campos_obrigatorios_nao_sejam_passados_sistema_deve_levantar_exception()
+	{
+		$this->setExpectedException( "Exception" );
+		$correios = new CorreiosWebService();
+	}//function
+	
+	public function test_caso_informacoes_nao_seja_passadas_corretamente_deve_levantar_exception()
 	{
 		$this->setExpectedException( "Exception" );			
-		$correios = new CorreiosWebService();
-
+		$correios = new CorreiosWebService(array("origem"=>'71addddd', "destino"=>'72151aaa'));
+		
+		unset( $correios );
 	}//function
 	
 	public function test_parametros_passados_para_webservice_deve_gerar_uma_query_string()
@@ -82,7 +89,7 @@ class TestCorreiosWebService extends PHPUnit_Framework_TestCase
 	public function test_caso_um_encomenda_que_nao_exista_seja_recupera_deve_haver_um_exception()
 	{
 		$this->setExpectedException('Exception');
-		$this->correios->encomenda1;
+		$this->correios->filter("encomenda1");
 	}//function
 
 	public function test_monta_url_consulta_pedido()
@@ -177,7 +184,7 @@ class TestCorreiosWebService extends PHPUnit_Framework_TestCase
 		$this->correios->usMoney('15,aa');
 	}//function
 
-	public function test_process_encomendas_deve_retornar_true_apos_processamento()
+	/*public function test_process_encomendas_deve_retornar_true_apos_processamento()
 	{
 		$this->assertEquals( $this->correios->count(), 0);
 		$encomenda1 = new Encomenda();
@@ -198,6 +205,29 @@ class TestCorreiosWebService extends PHPUnit_Framework_TestCase
 		$this->assertTrue( $this->correios->processEncomendas() );
 		$this->assertEquals( $this->correios->filter("encomenda1")->valor,  15.7 );
 		
-	}//function
+	}//function*/
 	
+	public function test_caso_nao_exista_encomenda_e_process_encomenda_seja_invocado_deve_return_false()
+	{
+		$encomenda1 = new Encomenda();
+		$this->correios
+		->add(
+			$encomenda1->__set("formato", 1)
+					   ->__set("peso", 1)
+					   ->__set("comprimento", 20)
+					   ->__set("altura", 5)
+					   ->__set("largura", 15)
+					   ->__set("mao_propria", true)
+					   ->__set("valor_declarado", 200)
+					   ->__set("aviso_recebimento", false)
+					   ->__set("diametro", 0)
+					   ->__set("codigo", CorreiosWebService::PAC_SEM_CONTRATO )
+		);
+		
+		$this->correios->delete("encomenda1");
+		$this->assertFalse( $this->correios->processEncomendas() );
+		
+		unset( $encomenda1 );
+	}//function
+
 }//class
