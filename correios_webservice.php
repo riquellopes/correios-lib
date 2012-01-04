@@ -58,19 +58,19 @@ class CorreiosWebService extends Model
 		"retorno"=>array("value"=>"xml",
 						 "name"=>"StrRetorno",
 						 "required"=>false,
-						 "rule"=>"xml"
+						 "rule"=>"/xml/"
 		),
 		
 		"destino"=>array("value"=>null,
 						 "name"=>"sCepDestino",
 						 "required"=>true,
-						 "rule"=>"^[0-9]{8}$"
+						 "rule"=>"/^[0-9]{8}$/"
 		),
 
 		"origem"=>array("value"=>null,
 						"name"=>"sCepOrigem",
 						"required"=>true,
-						"rule"=>"^[0-9]{8}$"
+						"rule"=>"/^[0-9]{8}$/"
 		 ),
 		
 		/***
@@ -107,7 +107,7 @@ class CorreiosWebService extends Model
 				$value = isset($param[ $key ]) ? $param[ $key ] : $this->object[ $key ][ 'value' ];
 				$rule = $this->object[ $key ]["rule"];
 			
-				if( !is_null( $rule ) && !eregi( $rule, $value ) )
+				if( !is_null( $rule ) && !preg_match( $rule, $value ) )
 					throw new Exception("Erro ". __FUNCTION__ ."linha:". __LINE__ .", o atributo ". $key ." não atende as regras do service.");
 				$this->object[ $key ]["value"] = $value;
 			
