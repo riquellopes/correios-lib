@@ -9,13 +9,13 @@ class TestEncomenda extends PHPUnit_Framework_TestCase
 	public function setUp()
 	{
 		$this->encomenda = new Encomenda();
-		$this->encomenda->__set("formato", 1)
-						->__set("peso", 100)
-						->__set("comprimento", 60)
-						->__set("altura", 80)
-						->__set("largura", 80)
-						->__set("diametro", 100)
-						->__set("codigo", 40045);
+		$this->encomenda->set("formato", 1)
+						->set("peso", 100)
+						->set("comprimento", 60)
+						->set("altura", 80)
+						->set("largura", 80)
+						->set("diametro", 100)
+						->set("codigo", 40045);
 	}//function
 	
 	public function tearDown()
@@ -66,15 +66,15 @@ class TestEncomenda extends PHPUnit_Framework_TestCase
 	public function test_os_parametros_passados_para_encomenda_2_deve_gerar_uma_url()
 	{
 		$encomenda = new Encomenda();
-		$encomenda->__set("formato", 2)
-				  ->__set("peso", 30)
-				  ->__set("comprimento", 30)
-				  ->__set("altura", 10)
-				  ->__set("largura", 40)
-				  ->__set("diametro", 60)
-				  ->__set("codigo", 40045)
-				  ->__set("valor_declarado", 200)
-				  ->__set("aviso_recebimento", true);
+		$encomenda->set("formato", 2)
+				  ->set("peso", 30)
+				  ->set("comprimento", 30)
+				  ->set("altura", 10)
+				  ->set("largura", 40)
+				  ->set("diametro", 60)
+				  ->set("codigo", 40045)
+				  ->set("valor_declarado", 200)
+				  ->set("aviso_recebimento", true);
 		
 		$param = $encomenda->getParam();
 		$this->assertTrue( is_string( $param ) );
@@ -86,13 +86,13 @@ class TestEncomenda extends PHPUnit_Framework_TestCase
 	public function test_to_json_encomenda1()
 	{
 		$encomenda = new Encomenda();
-		$encomenda->__set("formato", 2)
-				  ->__set("peso", 30)
-				  ->__set("comprimento", 30)
-				  ->__set("altura", 10)
-				  ->__set("largura", 40)
-				  ->__set("diametro", 60)
-				  ->__set("codigo", 40045);
+		$encomenda->set("formato", 2)
+				  ->set("peso", 30)
+				  ->set("comprimento", 30)
+				  ->set("altura", 10)
+				  ->set("largura", 40)
+				  ->set("diametro", 60)
+				  ->set("codigo", 40045);
 		
 		$json = $encomenda->toJson();
 		$this->assertEquals( $json, '{"formato":2,"peso":30,"comprimento":30,"altura":10,"largura":40,"diametro":60,"codigo":40045,"valor":0,"valor_mao_propria":0,"valor_aviso_recebimento":0,"prazo_entrega":0,"mao_propria":false,"aviso_recebimento":false,"valor_declarado":0,"entrega_domiciliar":false,"entrega_sabado":false,"url":"","erro":0,"msg_erro":""}');
@@ -101,15 +101,15 @@ class TestEncomenda extends PHPUnit_Framework_TestCase
 	public function test_to_json_encomenda2()
 	{
 		$encomenda = new Encomenda();
-		$encomenda->__set("formato", 1)
-				  ->__set("peso", 100)
-				  ->__set("comprimento", 50)
-				  ->__set("altura", 100)
-				  ->__set("largura", 50)
-				  ->__set("diametro", 100)
-				  ->__set("codigo", 40045)
-				  ->__set("aviso_recebimento", true)
-				  ->__set("mao_propria", true);
+		$encomenda->set("formato", 1)
+				  ->set("peso", 100)
+				  ->set("comprimento", 50)
+				  ->set("altura", 100)
+				  ->set("largura", 50)
+				  ->set("diametro", 100)
+				  ->set("codigo", 40045)
+				  ->set("aviso_recebimento", true)
+				  ->set("mao_propria", true);
 		
 		$json = $encomenda->toJson();
 		$this->assertEquals( $json, '{"formato":1,"peso":100,"comprimento":50,"altura":100,"largura":50,"diametro":100,"codigo":40045,"valor":0,"valor_mao_propria":0,"valor_aviso_recebimento":0,"prazo_entrega":0,"mao_propria":true,"aviso_recebimento":true,"valor_declarado":0,"entrega_domiciliar":false,"entrega_sabado":false,"url":"","erro":0,"msg_erro":""}');

@@ -74,13 +74,13 @@ class TestCorreiosWebService extends PHPUnit_Framework_TestCase
 	{
 		$encomenda = new Encomenda();
 		$this->correios->add(
-			$encomenda->__set("formato", 2)
-					  ->__set("peso", 30)
-					  ->__set("comprimento", 30)
-					  ->__set("altura", 10)
-					  ->__set("largura", 40)
-					  ->__set("diametro", 60)
-					  ->__set("codigo", CorreiosWebService::SEDEX_A_COBRAR_SEM_CONTRATO )
+			$encomenda->set("formato", 2)
+					  ->set("peso", 30)
+					  ->set("comprimento", 30)
+					  ->set("altura", 10)
+					  ->set("largura", 40)
+					  ->set("diametro", 60)
+					  ->set("codigo", CorreiosWebService::SEDEX_A_COBRAR_SEM_CONTRATO )
 		);
 		
 		$this->assertEquals( $this->correios->count(), 1);
@@ -98,24 +98,24 @@ class TestCorreiosWebService extends PHPUnit_Framework_TestCase
 		$encomenda2 = new Encomenda();
 		$this->correios
 		->add(
-			$encomenda1->__set("formato", 2)
-					   ->__set("peso", 30)
-					   ->__set("comprimento", 30)
-					   ->__set("altura", 10)
-					   ->__set("largura", 40)
-					   ->__set("diametro", 60)
-					   ->__set("codigo", CorreiosWebService::SEDEX_A_COBRAR_SEM_CONTRATO )
+			$encomenda1->set("formato", 2)
+					   ->set("peso", 30)
+					   ->set("comprimento", 30)
+					   ->set("altura", 10)
+					   ->set("largura", 40)
+					   ->set("diametro", 60)
+					   ->set("codigo", CorreiosWebService::SEDEX_A_COBRAR_SEM_CONTRATO )
 		)		
 		->add(
-			$encomenda2->__set("formato", 1)
-					   ->__set("peso", 100)
-					   ->__set("comprimento", 50)
-					   ->__set("altura", 70)
-					   ->__set("largura", 40)
-					   ->__set("diametro", 60)
-					   ->__set("codigo", CorreiosWebService::E_SEDEX_COM_CONTRATO_GRUPO_TRES )
-					   ->__set("valor_declarado", 200)
-				  	   ->__set("aviso_recebimento", true)
+			$encomenda2->set("formato", 1)
+					   ->set("peso", 100)
+					   ->set("comprimento", 50)
+					   ->set("altura", 70)
+					   ->set("largura", 40)
+					   ->set("diametro", 60)
+					   ->set("codigo", CorreiosWebService::E_SEDEX_COM_CONTRATO_GRUPO_TRES )
+					   ->set("valor_declarado", 200)
+				  	   ->set("aviso_recebimento", true)
 		);
 		
 		$this->assertEquals( $this->correios->count(), 2, "Quantidade de encomendas.");
@@ -140,22 +140,22 @@ class TestCorreiosWebService extends PHPUnit_Framework_TestCase
 		$encomenda2 = new Encomenda();
 		$this->correios
 		->add(
-			$encomenda1->__set("formato", 2)
-					   ->__set("peso", 30)
-					   ->__set("comprimento", 30)
-					   ->__set("altura", 10)
-					   ->__set("largura", 40)
-					   ->__set("diametro", 60)
-					   ->__set("codigo", CorreiosWebService::SEDEX_A_COBRAR_SEM_CONTRATO )
+			$encomenda1->set("formato", 2)
+					   ->set("peso", 30)
+					   ->set("comprimento", 30)
+					   ->set("altura", 10)
+					   ->set("largura", 40)
+					   ->set("diametro", 60)
+					   ->set("codigo", CorreiosWebService::SEDEX_A_COBRAR_SEM_CONTRATO )
 		)		
 		->add(
-			$encomenda2->__set("formato", 1)
-					   ->__set("peso", 100)
-					   ->__set("comprimento", 50)
-					   ->__set("altura", 70)
-					   ->__set("largura", 40)
-					   ->__set("diametro", 60)
-					   ->__set("codigo", CorreiosWebService::E_SEDEX_COM_CONTRATO_GRUPO_TRES )
+			$encomenda2->set("formato", 1)
+					   ->set("peso", 100)
+					   ->set("comprimento", 50)
+					   ->set("altura", 70)
+					   ->set("largura", 40)
+					   ->set("diametro", 60)
+					   ->set("codigo", CorreiosWebService::E_SEDEX_COM_CONTRATO_GRUPO_TRES )
 		);
 		
 		$this->assertEquals( $this->correios->count(), 2, "Quantidade de encomendas.");
@@ -184,44 +184,44 @@ class TestCorreiosWebService extends PHPUnit_Framework_TestCase
 		$this->correios->usMoney('15,aa');
 	}//function
 
-	/*public function test_process_encomendas_deve_retornar_true_apos_processamento()
+	public function test_process_encomendas_deve_retornar_true_apos_processamento()
 	{
 		$this->assertEquals( $this->correios->count(), 0);
 		$encomenda1 = new Encomenda();
 		$this->correios
 		->add(
-			$encomenda1->__set("formato", 1)
-					   ->__set("peso", 1)
-					   ->__set("comprimento", 20)
-					   ->__set("altura", 5)
-					   ->__set("largura", 15)
-					   ->__set("mao_propria", true)
-					   ->__set("valor_declarado", 200)
-					   ->__set("aviso_recebimento", false)
-					   ->__set("diametro", 0)
-					   ->__set("codigo", CorreiosWebService::PAC_SEM_CONTRATO )
+			$encomenda1->set("formato", 1)
+					   ->set("peso", 1)
+					   ->set("comprimento", 20)
+					   ->set("altura", 5)
+					   ->set("largura", 15)
+					   ->set("mao_propria", true)
+					   ->set("valor_declarado", 200)
+					   ->set("aviso_recebimento", false)
+					   ->set("diametro", 0)
+					   ->set("codigo", CorreiosWebService::PAC_SEM_CONTRATO )
 		);
 		$this->assertEquals( $this->correios->count(), 1, "Quantidade de encomendas.");
 		$this->assertTrue( $this->correios->processEncomendas() );
 		$this->assertEquals( $this->correios->filter("encomenda1")->valor,  15.7 );
 		
-	}//function*/
+	}//function
 	
 	public function test_caso_nao_exista_encomenda_e_process_encomenda_seja_invocado_deve_return_false()
 	{
 		$encomenda1 = new Encomenda();
 		$this->correios
 		->add(
-			$encomenda1->__set("formato", 1)
-					   ->__set("peso", 1)
-					   ->__set("comprimento", 20)
-					   ->__set("altura", 5)
-					   ->__set("largura", 15)
-					   ->__set("mao_propria", true)
-					   ->__set("valor_declarado", 200)
-					   ->__set("aviso_recebimento", false)
-					   ->__set("diametro", 0)
-					   ->__set("codigo", CorreiosWebService::PAC_SEM_CONTRATO )
+			$encomenda1->set("formato", 1)
+					   ->set("peso", 1)
+					   ->set("comprimento", 20)
+					   ->set("altura", 5)
+					   ->set("largura", 15)
+					   ->set("mao_propria", true)
+					   ->set("valor_declarado", 200)
+					   ->set("aviso_recebimento", false)
+					   ->set("diametro", 0)
+					   ->set("codigo", CorreiosWebService::PAC_SEM_CONTRATO )
 		);
 		
 		$this->correios->delete("encomenda1");

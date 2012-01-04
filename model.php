@@ -83,5 +83,39 @@ abstract class Model
 		
 		return json_encode( $data );
 	}//function
+	
+	/**
+	 * Método ...
+	 * 
+     * @access public
+	 * @param string $name
+	 * @return mix
+     */
+	public function get($name)
+	{
+		try
+		{	
+			return $this->__get( $name );
+		}
+		catch( Exception $error ){ throw $error; }
+	}//function
+	
+	/**
+	 * Método ...
+	 * 
+     * @access public
+	 * @param string $name
+     * @param mix $value
+	 * @return object
+     */
+	public function set($name, $value)
+	{
+		try
+		{ 
+			$this->__set( $name, $value);
+			return $this;
+		}		
+		catch( Exception $error ){ throw $error; }
+	}//function
 
 }//class
