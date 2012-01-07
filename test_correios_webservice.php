@@ -184,7 +184,7 @@ class TestCorreiosWebService extends PHPUnit_Framework_TestCase
 		$this->correios->usMoney('15,aa');
 	}//function
 
-	/*public function test_process_encomendas_deve_retornar_true_apos_processamento()
+	public function test_process_encomendas_deve_retornar_true_apos_processamento()
 	{
 		$this->assertEquals( $this->correios->count(), 0);
 		$encomenda1 = new Encomenda();
@@ -205,7 +205,7 @@ class TestCorreiosWebService extends PHPUnit_Framework_TestCase
 		$this->assertTrue( $this->correios->processEncomendas() );
 		$this->assertEquals( $this->correios->filter("encomenda1")->valor,  15.7 );
 		
-	}//function*/
+	}//function
 	
 	public function test_caso_nao_exista_encomenda_e_process_encomenda_seja_invocado_deve_return_false()
 	{
