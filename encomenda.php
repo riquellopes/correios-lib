@@ -171,7 +171,7 @@ class Encomenda extends Model
 	}//function
 	
 	/***
-	 * Método que atributo n códigos a uma mesma encomenda.
+	 * Método que atribui n códigos a uma mesma encomenda.
 	 *
 	 * @access public
 	 * @param int $value
