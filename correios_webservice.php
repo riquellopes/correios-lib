@@ -140,22 +140,8 @@ class CorreiosWebService extends Model
   {		
 	return $this->qtd_encomendas; 
   }//function
- 
-  /**
-   * Método que verifica se uma encomenda existe.
-   *
-   * @access private
-   * @param string $name
-   * @param string $msg_error
-   * @throws Exception 
-   * @return void
-   */ 
-  protected function validation($name, $msg_error)
-  {
-  	if( !array_key_exists($name, $this->encomendas ) )
-			throw new Exception( $msg_error );
-  }//function
-
+ 	
+  
   /**
    * Método que recupera valor do atributo $encomendas
    *
@@ -167,7 +153,7 @@ class CorreiosWebService extends Model
   {
 	try
 	{		
-		$this->validation( $name, "Erro em ". __FUNCTION__.", linha ".__LINE__.": A encomenda ". $name . "não deu entrada em nosso sistema.");
+		$this->objectExist( $name, $this->encomendas, "Erro em ". __FUNCTION__.", linha ".__LINE__.": A encomenda ". $name . "não deu entrada em nosso sistema.");
 		return $this->encomendas[ $name ];
 	}
 	catch(Exception $error)
@@ -243,7 +229,7 @@ class CorreiosWebService extends Model
 	{
 		try
 		{
-			$this->validation( $encomenda, "Erro em ". __FUNCTION__ .", linha " .__LINE__ .": Encomenda não deu entrada no webservice." );			
+			$this->objectExist( $encomenda, $this->encomendas, "Erro em ". __FUNCTION__ .", linha " .__LINE__ .": Encomenda não deu entrada no webservice." );			
 			$this->encomendas[ $encomenda ] = null;
 			$qtd_encomendas = $this->qtd_encomendas;
 			$qtd_encomendas--;

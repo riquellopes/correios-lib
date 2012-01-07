@@ -115,4 +115,37 @@ class TestEncomenda extends PHPUnit_Framework_TestCase
 		$this->assertEquals( $json, '{"formato":1,"peso":100,"comprimento":50,"altura":100,"largura":50,"diametro":100,"codigo":40045,"valor":0,"valor_mao_propria":0,"valor_aviso_recebimento":0,"prazo_entrega":0,"mao_propria":true,"aviso_recebimento":true,"valor_declarado":0,"entrega_domiciliar":false,"entrega_sabado":false,"url":"","erro":0,"msg_erro":""}');
 	}//function
 	
+	public function test_caso_seja_necessario_usuario_pode_setar_mais_de_um_codigo()
+	{
+		$encomenda = new Encomenda();
+		$encomenda->set("formato", 1)
+				  ->set("peso", 100)
+				  ->set("comprimento", 50)
+				  ->set("altura", 100)
+				  ->set("largura", 50)
+				  ->set("diametro", 100)
+				  ->set("aviso_recebimento", true)
+				  ->set("mao_propria", true)
+				  ->setNCodigos(40045)
+				  ->setNCodigos(40436);
+		
+		$this->assertEquals( $encomenda->get("codigo"), "40045,40436");
+		$this->assertTrue( $encomenda->isMultCodigo() );
+	}//function
+
+	public function test_caso_multiplos_codigos_de_encomenda_nao_sejam_validos_deve_haver_exception()
+	{
+		$this->setExpectedException( "Exception" );
+		$encomenda = new Encomenda();
+		$encomenda->set("formato", 1)
+				  ->set("peso", 100)
+				  ->set("comprimento", 50)
+				  ->set("altura", 100)
+				  ->set("largura", 50)
+				  ->set("diametro", 100)
+				  ->set("aviso_recebimento", true)
+				  ->set("mao_propria", true)
+				  ->setNCodigos(40)
+				  ->setNCodigos("dgkfjkj");
+	}//function
 }//class

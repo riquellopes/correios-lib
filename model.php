@@ -21,7 +21,8 @@ abstract class Model
 	{
 		try
 		{
-			$this->validation( $name, "Erro em ". __FUNCTION__ .", linha ". __LINE__ .": O atributo '". $name ."', não é padrão do sistema." );
+			$this->objectExist( $name, $this->object, "Erro em ". __FUNCTION__ .", linha ". __LINE__ .": O atributo '". $name ."', não existe no sistema." );
+			#$this->validation( $name, $value, "Erro em ". __FUNCTION__ .", linha ". __LINE__ .": O atributo '". $name ."', não atende as regras do sistema." );
 			$this->object[ $name ]['value'] = $value;
 			return $this;			
 		}
@@ -43,7 +44,7 @@ abstract class Model
 	{
 		try
 		{		
-			$this->validation( $name, "Erro em ". __FUNCTION__ .", linha ". __LINE__ .": O atributo '". $name ."', não é padrão do sistema." );
+			$this->objectExist( $name, $this->object, "Erro em ". __FUNCTION__ .", linha ". __LINE__ .": O atributo '". $name ."', não é padrão do sistema." );
 			return $this->object[ $name ]['value'];
 		}
 		catch(Exception $error )
@@ -55,19 +56,37 @@ abstract class Model
 	abstract protected function getParam();
 	
 	/**
-     * Método que verifica se $name do atributo existe em $object.
+     * Método que verifica se $value esta dentro das regras do $object.
 	 *
-	 * @access private
+	 * @access protected
+	 * @param string $name
+	 * @param mix $value
 	 * @param string $msg_error
      * @throws Exception
 	 * @return void
      */
-	protected function validation( $name, $msg_error)
+	protected function validation( $name, $value=null, $msg_error="")
 	{
-		if( !array_key_exists($name, $this->object ) )
+		$object = $this->object[ $name ];
+		if( !is_null( $object['rule'] ) && !preg_match( $object['rule'],  $value) )
 			throw new Exception( $msg_error );
 	}//function
 	
+	/**
+     * Método que verifica se $key existe em $search.
+	 *
+     * @param string $key
+     * @param array $search
+	 * @param string $msg_error
+	 * @throws Exception
+	 * @return void
+     */
+	protected function objectExist( $key, $search, $msg_error="" )
+	{
+		if( !array_key_exists( $key, $search ) )
+			throw new Exception( $msg_error );
+	}//function
+
 	/**
      * Método que faz o parse dos atributos da class para o formato JSON.
      *
@@ -85,7 +104,7 @@ abstract class Model
 	}//function
 	
 	/**
-	 * Método ...
+	 * Método que cria uma mascara para o método __get.
 	 * 
      * @access public
 	 * @param string $name
@@ -101,7 +120,7 @@ abstract class Model
 	}//function
 	
 	/**
-	 * Método ...
+	 * Método que cria uma mascara para o método __set.
 	 * 
      * @access public
 	 * @param string $name
@@ -117,5 +136,5 @@ abstract class Model
 		}		
 		catch( Exception $error ){ throw $error; }
 	}//function
-
+	
 }//class
