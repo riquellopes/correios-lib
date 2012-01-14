@@ -1,4 +1,4 @@
-<?
+<?php
 abstract class Model
 {
 	protected $object = array();
@@ -21,8 +21,11 @@ abstract class Model
 	{
 		try
 		{
-			$this->objectExist( $name, $this->object, "Erro em ". __FUNCTION__ .", linha ". __LINE__ .": O atributo '". $name ."', não existe no sistema." );
-			#$this->validation( $name, $value, "Erro em ". __FUNCTION__ .", linha ". __LINE__ .": O atributo '". $name ."', não atende as regras do sistema." );
+			$name = strtolower( $name );
+			
+			$this->validation( $name, 
+							   $value );
+			
 			$this->object[ $name ]['value'] = $value;
 			return $this;			
 		}
@@ -44,7 +47,11 @@ abstract class Model
 	{
 		try
 		{		
-			$this->objectExist( $name, $this->object, "Erro em ". __FUNCTION__ .", linha ". __LINE__ .": O atributo '". $name ."', não é padrão do sistema." );
+			$name = strtolower( $name );
+						
+			$this->objectExist( $name, 
+								$this->object );
+			
 			return $this->object[ $name ]['value'];
 		}
 		catch(Exception $error )
@@ -56,7 +63,7 @@ abstract class Model
 	abstract protected function getParam();
 	
 	/**
-     * Método que verifica se $value esta dentro das regras do $object.
+     * Método que verifica se $value respeita as regras do $object.
 	 *
 	 * @access protected
 	 * @param string $name
@@ -66,9 +73,29 @@ abstract class Model
 	 * @return void
      */
 	protected function validation( $name, $value=null, $msg_error="")
-	{
+	{		
+		$this->objectExist( $name, $this->object );
+		
+		/***
+		 * Recupera objeto::
+		 */
 		$object = $this->object[ $name ];
-		if( !is_null( $object['rule'] ) && !preg_match( $object['rule'],  $value) )
+		
+		/***
+		 * Caso um $msg_error não seja passada por parâmetro,
+		 * o sistema verifica se objeto possui uma mensagem
+		 * configurada, se não exister ele passa um valor em
+		 * branco para o Exception::
+         */
+		$msg_error = ( empty( $msg_error ) ? isset($object['message']) ? $object['message'] : "" : $msg_error );
+
+		/***
+		 * Se uma regra não tiver sido definida para o objeto,
+		 * o sistema vai ignorar o $value passado::
+		 */
+		$rule = ( isset( $object['rule'] ) ? $object['rule'] : null );
+		
+		if( !is_null( $rule ) && !preg_match( $rule,  $value) )
 			throw new Exception( $msg_error );
 	}//function
 	
@@ -83,6 +110,11 @@ abstract class Model
      */
 	protected function objectExist( $key, $search, $msg_error="" )
 	{
+		/***
+		 * Caso nenhuma mensagem de erro seja passada por parâmetro,
+		 * objectExist deve usar sua mensagem default::
+		 */		
+		$msg_error = $msg_error ? $msg_error : "Erro em ". __FUNCTION__ .", linha ". __LINE__ .": O atributo '". $key ."', não existe no sistema.";		
 		if( !array_key_exists( $key, $search ) )
 			throw new Exception( $msg_error );
 	}//function

@@ -1,4 +1,4 @@
-<?
+<?php
 require_once "model.php";
 
 class Encomenda extends Model
@@ -15,7 +15,7 @@ class Encomenda extends Model
 												 "name"=>"nCdFormato",
 												 "required"=>true,
 												 "url"=>true,
-												 "rule"=>"/\d{1}/"
+												 "rule"=>"/[1-2]{1}/"
 								),
 								"peso"=>array("value"=>null, 
 											  "name"=>"nVlPeso",
@@ -27,25 +27,25 @@ class Encomenda extends Model
 													 "name"=>"nVlComprimento",
 													 "required"=>true,
 												 	 "url"=>true,
-													 "rule"=>""
+													 "rule"=>"/\d/"
 								),
 								"altura"=>array("value"=>null, 
 												"name"=>"nVlAltura",
 												"required"=>true,
 												"url"=>true,
-												"rule"=>""
+												"rule"=>"/\d/"
 								),
 								"largura"=>array("value"=>null, 
 												 "name"=>"nVlLargura",
 												 "required"=>true,
 												 "url"=>true,
-											     "rule"=>""
+											     "rule"=>"/\d/"
 								),
 								"diametro"=>array("value"=>null, 
 												  "name"=>"nVlDiametro",
 												  "required"=>true,
 												  "url"=>true,
-												  "rule"=>""
+												  "rule"=>"/\d/"
 								),
 								"codigo"=>array("value"=>null,
 												"name"=>"nCdServico",
@@ -61,74 +61,74 @@ class Encomenda extends Model
 											   "name"=>"Valor",
 											   "required"=>false,
 											   "url"=>false,
-											   "rule"=>""
+											   "rule"=>"/\d/"
 								),
 								"valor_mao_propria"=>array("value"=>0,
 											   			   "name"=>"ValorMaoPropria",
 														   "required"=>false,
 														   "url"=>false,
-														   "rule"=>""
+														   "rule"=>"/\d/"
 								),
 								"valor_aviso_recebimento"=>array("value"=>0,
 																 "name"=>"ValorAvisoRecebimento",
 																 "required"=>false,
 																 "url"=>false,
-																 "rule"=>""
+																 "rule"=>"/\d/"
 								),
 								"prazo_entrega"=>array("value"=>0,
 													   "name"=>"PrazoEntrega",
 													   "required"=>false,
 												 	   "url"=>false,
-													   "rule"=>""
+													   "rule"=>"/\d/"
 								),
 								"mao_propria"=>array("value"=>false,
 													 "name"=>"sCdMaoPropria",
 													 "required"=>false,
 												 	 "url"=>true,
-													 "rule"=>""
+													 "rule"=>null
 								),
 								"aviso_recebimento"=>array("value"=>false,
 														   "name"=>"sCdAvisoRecebimento",
 														   "required"=>false,
 														   "url"=>true,
-														   "rule"=>""
+														   "rule"=>null
 								),
 								"valor_declarado"=>array("value"=>0,
 														 "name"=>"nVlValorDeclarado",
 														 "required"=>false,
 														 "url"=>true,
-														 "rule"=>""
+														 "rule"=>"/\d/"
 								),
 								"entrega_domiciliar"=>array("value"=>false,
 															"name"=>"EntregaDomiciliar",
 															"required"=>false,
 														    "url"=>false,
-															"rule"=>""
+															"rule"=>null
 
 								),
 								"entrega_sabado"=>array("value"=>false,
 														"name"=>"EntregaSabado",
 														"required"=>false,
 												 		"url"=>false,
-													    "rule"=>""
+													    "rule"=>null
 								),
 								"url"=>array("value"=>"",
 											 "name"=>"url",
 											 "required"=>false,
 											 "url"=>false,
-											 "rule"=>""
+											 "rule"=>"|^http(s)?://[a-z0-9-]+(\.[a-z0-9-]+)*(:[0-9]+)?(/.*)?$|i"
 								),
 								"erro"=>array("value"=>0,
 											  "name"=>"Erro",
 											  "required"=>false,
 											  "url"=>false,
-											  "rule"=>""
+											  "rule"=>null
 								),
 							    "msg_erro"=>array("value"=>"",
 												  "name"=>"MsgErro",
 												  "required"=>false,
 												  "url"=>false,
-												  "rule"=>""
+												  "rule"=>null
 								)
 		);
 	
@@ -171,7 +171,7 @@ class Encomenda extends Model
 	}//function
 	
 	/***
-	 * Método que atribui n códigos a uma mesma encomenda.
+	 * Método que atributo n códigos a uma mesma encomenda.
 	 *
 	 * @access public
 	 * @param int $value

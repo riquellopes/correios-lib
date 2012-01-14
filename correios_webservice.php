@@ -1,4 +1,4 @@
-<?
+<?php
 require_once "model.php";
  try
 {
@@ -57,34 +57,30 @@ class CorreiosWebService extends Model
          */
 		"retorno"=>array("value"=>"xml",
 						 "name"=>"StrRetorno",
-						 "required"=>false,
-						 "rule"=>"/xml/"
+						 "rule"=>"/xml/",
+						 "message"=>"O retorno só esta disponível no padrão XML."
 		),
 		
 		"destino"=>array("value"=>null,
 						 "name"=>"sCepDestino",
-						 "required"=>true,
-						 "rule"=>"/^[0-9]{8}$/"
+						 "rule"=>"/^[0-9]{8}$/",
+						 "message"=>"O cep de destino, não é um cep valido."
 		),
 
 		"origem"=>array("value"=>null,
 						"name"=>"sCepOrigem",
-						"required"=>true,
-						"rule"=>"/^[0-9]{8}$/"
+						"rule"=>"/^[0-9]{8}$/",
+						"message"=>"O cep de origem, não é um cep valido."
 		 ),
 		
 		/***
          * O preenchimento desses atributos são livres:
          */
 		"senha"=>array("value"=>"",
-					   "name"=>"sDsSenha",
-					   "required"=>false,
-					   "rule"=>null
+					   "name"=>"sDsSenha"
 		),
 		"cod_empresa"=>array("value"=>"",
-							 "name"=>"nCdEmpresa",
-							 "required"=>false,
-							 "rule"=>null
+							 "name"=>"nCdEmpresa"
 		)
   );
   
@@ -104,14 +100,10 @@ class CorreiosWebService extends Model
 			/***
 			 * Se atributo não for obrigatório, ele deve receber seu valor default::
 			 */				
-				$value = isset($param[ $key ]) ? $param[ $key ] : $this->object[ $key ][ 'value' ];
-				$rule = $this->object[ $key ]["rule"];
-			
-				if( !is_null( $rule ) && !preg_match( $rule, $value ) )
-					throw new Exception("Erro ". __FUNCTION__ ."linha:". __LINE__ .", o atributo ". $key ." não atende as regras do service.");
-				$this->object[ $key ]["value"] = $value;
-			
-				unset( $rule, $value);
+				$this->set($key, 
+						   isset($param[ $key ]) ? $param[ $key ] : $this->object[ $key ][ 'value' ]
+				);
+				
 		}//foreach
 
   }//function
@@ -125,8 +117,37 @@ class CorreiosWebService extends Model
    */
   public function add( Encomenda $encomenda )
   { 
-	 $this->encomendas[ $this->getIndex() ] = $this->createUrl( $encomenda );
-	 $this->qtd_encomendas++;
+	 if( $encomenda->isMultCodigo() )
+	 {
+		$codigos = explode(",", $encomenda->codigo );
+		$id = "";
+		foreach( $codigos as $key => $value )
+		{
+			$object = clone $encomenda;
+			$object->codigo = (int) $value;
+			
+			if( $key == 0 )
+			{
+				$this->add( $object );
+				$id = $this->lastInsertId();
+				continue;			
+			}//if
+			
+			$this->createUrl( $object );
+			$this->encomendas[ $id."_".$key ] = $object;
+			
+			unset( $object );	
+		}//foreach
+		
+		$this->qtd_encomendas += ( count( $codigos ) - 1 );
+		unset( $codigos, $encomenda );
+	 }
+	 else
+	 {
+	 	$this->createUrl( $encomenda );
+	 	$this->encomendas[ $this->getIndex() ] = $encomenda;
+	 	$this->qtd_encomendas++;
+	 }//if
 	 return $this;
   }//function
   
@@ -152,8 +173,14 @@ class CorreiosWebService extends Model
   public function filter( $name )
   {
 	try
-	{		
-		$this->objectExist( $name, $this->encomendas, "Erro em ". __FUNCTION__.", linha ".__LINE__.": A encomenda ". $name . "não deu entrada em nosso sistema.");
+	{				
+		$name = strtolower( $name );
+				
+		$this->objectExist( $name, 
+							$this->encomendas, 
+							"Erro em ". __FUNCTION__.", linha ".__LINE__.": A encomenda ". $name . "não deu entrada em nosso sistema."
+		);
+		
 		return $this->encomendas[ $name ];
 	}
 	catch(Exception $error)
@@ -172,9 +199,30 @@ class CorreiosWebService extends Model
    */
   private function getIndex()
   {
-	return (string) str_replace("XXX", ( $this->count() + 1 ), "encomendaXXX");
+	$id = $this->lastInsertId();
+	
+	/***
+	 * Suporte a sub index::
+	 */
+	if( preg_match("/encomenda\d_\d/", $id) )
+		$id = current( explode("_", $id) );
+	
+	$id = (int) preg_replace( "/encomenda/", "", $id );
+	return (string) str_replace("XXX", ( $id + 1 ), "encomendaXXX");
   }//function
   
+  /**
+   * Método que recupera último add que $encomendas recebeu.
+   * 
+   * @access private
+   * @return int
+   */
+  private function lastInsertId()
+  {
+	$keys_encomendas = array_keys( $this->encomendas );
+	return current( array_reverse( $keys_encomendas ) );
+  }//function
+
   /**
    * Método que recupera valor do atributo $param.
    *
@@ -186,10 +234,8 @@ class CorreiosWebService extends Model
   {
 		$data = array();		
 		foreach( $this->object as  $key => $parameter )
-		{
-			if( $parameter['required'] && is_null( $parameter['value'] ) )
-				throw new Exception( "Erro em ". __FUNCTION__ .", linha ". __LINE__ .": O parâmetro ".$key.", deve ser informado." );
-			
+		{	
+			$this->validation($key, $parameter['value']);
 			$data[ $parameter['name'] ] = $parameter['value'];
 
 		}//foreach
@@ -203,16 +249,15 @@ class CorreiosWebService extends Model
    *
    * @access private
    * @param Encomenda $encomenda
-   * @return Encomenda
+   * @return void void
    */
   private function createUrl( Encomenda &$encomenda )
   {
 	  $encomenda->url = trim( CorreiosWebService::URLBASE."".$this->getParam()."&".$encomenda->getParam() );
-	  return $encomenda;
   }//function
   
   /**
-   * Método que apaga todas as encomendas da fila.
+   * Método que apaga as encomendas da fila.
    *
    * @access public
    * @param string $encomenda
@@ -229,7 +274,12 @@ class CorreiosWebService extends Model
 	{
 		try
 		{
-			$this->objectExist( $encomenda, $this->encomendas, "Erro em ". __FUNCTION__ .", linha " .__LINE__ .": Encomenda não deu entrada no webservice." );			
+			$encomenda = strtolower( $encomenda );			
+			$this->objectExist( $encomenda, 
+								$this->encomendas, 
+								"Erro em ". __FUNCTION__ .", linha " .__LINE__ .": Encomenda não deu entrada no webservice." 
+			);			
+			
 			$this->encomendas[ $encomenda ] = null;
 			$qtd_encomendas = $this->qtd_encomendas;
 			$qtd_encomendas--;
@@ -277,7 +327,7 @@ class CorreiosWebService extends Model
 		foreach( $this->encomendas as $key => $object )
 		{				
 				/***
-                 * Sistema não deve processar possições nulas do array::
+                 * Sistema não deve processar posições nulas do array::
                  */				
 				if( is_null( $object ) )
 					continue;

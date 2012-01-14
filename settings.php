@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * Define variáveis que são padrão no sistema::
  */
