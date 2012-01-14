@@ -82,6 +82,11 @@ abstract class Model
 		$object = $this->object[ $name ];
 		
 		/***
+		 * Define variavel $exception como false;
+		 */
+		$exception = false;
+		
+		/***
 		 * Caso um $msg_error não seja passada por parâmetro,
 		 * o sistema verifica se objeto possui uma mensagem
 		 * configurada, se não exister ele passa um valor em
@@ -95,7 +100,22 @@ abstract class Model
 		 */
 		$rule = ( isset( $object['rule'] ) ? $object['rule'] : null );
 		
-		if( !is_null( $rule ) && !preg_match( $rule,  $value) )
+		/***
+		 * Se o regra para validação a ser usada para o value seja
+		 * uma função do php, funçao deve ignorar a função preg_math::
+		 */
+		if( !is_null( $rule ) )
+		{
+			if( function_exists( $rule ) && in_array($rule, array("is_bool") ) )
+			{
+				if( !call_user_func( $rule, $value ) )
+					$exception=true;
+			}
+			elseif( !preg_match( $rule,  $value) )
+				$exception=true;
+		}//if
+		
+		if( $exception )
 			throw new Exception( $msg_error );
 	}//function
 	

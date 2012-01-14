@@ -13,45 +13,47 @@ class Encomenda extends Model
 							 */  							
 								"formato"=>array("value"=>null, 
 												 "name"=>"nCdFormato",
-												 "required"=>true,
-												 "url"=>true,
-												 "rule"=>"/[1-2]{1}/"
+												 "rule"=>"/[1-2]{1}/",
+												 "message"=>"O formato da encomenda só pode ser 1 ou 2.",
+												 "url"=>true
 								),
 								"peso"=>array("value"=>null, 
 											  "name"=>"nVlPeso",
-											  "required"=>true,
-											  "url"=>true,
-											  "rule"=>"/\d/"
+											  "rule"=>"/\d/",
+											  "message"=>"O peso da encomenda, não um peso valido.",
+											  "url"=>true
 								),
 								"comprimento"=>array("value"=>null, 
 													 "name"=>"nVlComprimento",
-													 "required"=>true,
-												 	 "url"=>true,
-													 "rule"=>"/\d/"
+													 "rule"=>"/\d/",
+													 "message"=>"O comprimento da encomenda, não um comprimento valido.",
+												 	 "url"=>true
 								),
 								"altura"=>array("value"=>null, 
 												"name"=>"nVlAltura",
-												"required"=>true,
-												"url"=>true,
-												"rule"=>"/\d/"
+												"rule"=>"/\d/",
+												"message"=>"A altura da encomenda, não uma altura valida.",
+												"url"=>true
+												
 								),
 								"largura"=>array("value"=>null, 
 												 "name"=>"nVlLargura",
-												 "required"=>true,
-												 "url"=>true,
-											     "rule"=>"/\d/"
+												 "rule"=>"/\d/",
+											     "message"=>"A largura da encomenda, não uma largura valida.",
+												 "url"=>true
 								),
 								"diametro"=>array("value"=>null, 
 												  "name"=>"nVlDiametro",
-												  "required"=>true,
-												  "url"=>true,
-												  "rule"=>"/\d/"
+												  "rule"=>"/\d/",
+												  "message"=>"O diâmetro da encomenda, não um diâmetro valido.",
+												  "url"=>true
 								),
 								"codigo"=>array("value"=>null,
 												"name"=>"nCdServico",
-												"required"=>true,
-												"url"=>true,
-												"rule"=>"/\d{5}/"
+												"rule"=>"/\d{5}/",
+												"message"=>"O código da encomenda, não um código valido.",
+												"url"=>true
+												
 								),
 							    
                           /***
@@ -59,81 +61,70 @@ class Encomenda extends Model
                            */
 								"valor"=>array("value"=>0,
 											   "name"=>"Valor",
-											   "required"=>false,
 											   "url"=>false,
 											   "rule"=>"/\d/"
 								),
 								"valor_mao_propria"=>array("value"=>0,
 											   			   "name"=>"ValorMaoPropria",
-														   "required"=>false,
 														   "url"=>false,
 														   "rule"=>"/\d/"
 								),
 								"valor_aviso_recebimento"=>array("value"=>0,
 																 "name"=>"ValorAvisoRecebimento",
-																 "required"=>false,
 																 "url"=>false,
 																 "rule"=>"/\d/"
 								),
 								"prazo_entrega"=>array("value"=>0,
 													   "name"=>"PrazoEntrega",
-													   "required"=>false,
 												 	   "url"=>false,
 													   "rule"=>"/\d/"
 								),
 								"mao_propria"=>array("value"=>false,
 													 "name"=>"sCdMaoPropria",
-													 "required"=>false,
 												 	 "url"=>true,
-													 "rule"=>null
+													 "rule"=>"is_bool"
 								),
 								"aviso_recebimento"=>array("value"=>false,
 														   "name"=>"sCdAvisoRecebimento",
-														   "required"=>false,
 														   "url"=>true,
-														   "rule"=>null
+														   "rule"=>"is_bool"
 								),
 								"valor_declarado"=>array("value"=>0,
 														 "name"=>"nVlValorDeclarado",
-														 "required"=>false,
 														 "url"=>true,
 														 "rule"=>"/\d/"
 								),
 								"entrega_domiciliar"=>array("value"=>false,
 															"name"=>"EntregaDomiciliar",
-															"required"=>false,
 														    "url"=>false,
-															"rule"=>null
+															"rule"=>"is_bool"
 
 								),
 								"entrega_sabado"=>array("value"=>false,
 														"name"=>"EntregaSabado",
-														"required"=>false,
 												 		"url"=>false,
-													    "rule"=>null
+													    "rule"=>"is_bool"
 								),
 								"url"=>array("value"=>"",
 											 "name"=>"url",
-											 "required"=>false,
-											 "url"=>false,
-											 "rule"=>"|^http(s)?://[a-z0-9-]+(\.[a-z0-9-]+)*(:[0-9]+)?(/.*)?$|i"
+											 "url"=>false#,
+									         #"rule"=>"|^http(s)?://[a-z0-9-]+(\.[a-z0-9-]+)*(:[0-9]+)?(/.*)?$|i"
 								),
 								"erro"=>array("value"=>0,
 											  "name"=>"Erro",
-											  "required"=>false,
 											  "url"=>false,
-											  "rule"=>null
+											  "rule"=>"/\d/"
 								),
 							    "msg_erro"=>array("value"=>"",
 												  "name"=>"MsgErro",
-												  "required"=>false,
 												  "url"=>false,
-												  "rule"=>null
+												  "rule"=>"/(\s*|\w)/"
 								)
 		);
 	
 	/**
-     * Método que recupera valor do atributo $param.
+     * Método que faz o parse dos atributos da encomenda para,
+     * query string.
 	 *
 	 * @access public
      * @param void void
@@ -142,15 +133,15 @@ class Encomenda extends Model
 	public function getParam()
 	{
 		$data = array();		
-		foreach( $this->object as  $key => $parameter )
+		foreach( $this->object as $key => $parameter )
 		{
-			if( $parameter['required'] && is_null( $parameter['value'] ) )
-				throw new Exception( "Erro em ". __FUNCTION__ .", linha ". __LINE__ .": O parâmetro ".$key.", deve ser informado." );
-
+			$this->validation($key, 
+						      $parameter['value']);
+						
 			/**
 			 * Monta url.
              */
-			elseif( $parameter['url'] )
+			if( $parameter['url'] )
 			{
 				$value = $parameter['value'];
 				
@@ -171,7 +162,7 @@ class Encomenda extends Model
 	}//function
 	
 	/***
-	 * Método que atributo n códigos a uma mesma encomenda.
+	 * Método que atribui n códigos a uma mesma encomenda.
 	 *
 	 * @access public
 	 * @param int $value
@@ -184,8 +175,7 @@ class Encomenda extends Model
 		if( !is_null( $codigo ) )
 			$codigo = (array) explode(",", $codigo);
 		
-		if( !preg_match( $this->object['codigo']['rule'], $value ))
-			throw new Exception( "Erro em ".__FUNCTION__.", linha ".__LINE__.": Código informado não é valido." );
+		$this->validation("codigo", $value);	
 		$codigo[] = $value;
 				
 		$this->object[ "codigo" ][ "value" ] = implode(",", $codigo);
